@@ -1,0 +1,10 @@
+smoke: false
+seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+sizes: [20, 50, 100]
+families: [random, ansatz, qft]
+circuit_seeds: [200000, 200001]
+devices:
+  - {snapshot: benchmarks/devices/fake_brisbane.json}
+  - {kind: neutral, n: 100, seed: 99}
+algorithms: [sabre, noise_sabre, noiseroute, learned]
+checkpoint: runs/laptop-ppo/last.pt

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "noiseroute"
+version = "0.1.0"
+description = "Noise-aware joint placement and routing research platform"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = "MIT"
+dependencies = ["qiskit>=2.1,<3", "numpy>=2,<3", "gymnasium>=1,<2", "PyYAML>=6,<7"]
+[project.optional-dependencies]
+train = ["torch>=2.6,<3", "sb3-contrib>=2.6,<3"]
+bench = ["qiskit-aer>=0.17,<0.18", "mqt.bench>=2.3,<3", "qiskit-ibm-runtime>=0.40,<1"]
+ai = ["qiskit-ibm-transpiler==0.18.0", "qiskit==2.3.1"]
+export = ["torch>=2.6,<3", "onnx>=1.17,<2", "onnxruntime>=1.20,<2", "openvino>=2025,<2027"]
+demo = ["streamlit>=1.40,<2", "pandas>=2,<4"]
+dev = ["pytest>=8,<10", "ruff>=0.9", "build>=1", "maturin>=1.7,<2"]
+[project.scripts]
+noiseroute = "noiseroute.cli:main"
+[project.entry-points."qiskit.transpiler.routing"]
+noiseroute = "noiseroute.plugin:NoiseRoutePlugin"
+[project.entry-points."qiskit.transpiler.layout"]
+noiseroute = "noiseroute.plugin:NoiseLayoutPlugin"
+[tool.setuptools.packages.find]
+where = ["src"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+[tool.ruff]
+line-length = 110
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

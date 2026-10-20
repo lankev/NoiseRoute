@@ -1,0 +1,32 @@
+# Experimental short profile. Evaluate the resulting checkpoint before scaling.
+seed: 41
+torch_device: cuda
+torch_threads: 4
+shape: {nodes: 128, edges: 384, tokens: 64}
+model: {dim: 64, layers: 2, hierarchical: true}
+topologies: [line, ring, grid]
+families: [random, ansatz]
+circuit_depth: 4
+imitation_episodes: 72
+imitation_epochs: 5
+require_demo_coverage: true
+rollout_steps: 256
+batch_size: 32
+ppo_epochs: 5
+imitation_learning_rate: 0.00006
+ppo_learning_rate: 0.00001
+gamma: 1.0
+gae_lambda: 0.95
+clip_range: 0.2
+entropy_coef: 0.001
+reward_scale: 0.01
+value_loss: huber
+value_coef: 0.5
+target_kl: 0.02
+quality_gate:
+  window: 100
+  min_episodes: 30
+  max_failure_rate: 0.25
+  min_success_rate: 0.9
+curriculum:
+  - {qubits: 5, steps: 4096}

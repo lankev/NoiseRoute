@@ -1,0 +1,8 @@
+# Preserve corpus/checksum bytes across Windows and Unix checkouts.
+* text=auto eol=lf
+*.qasm -text
+*.qpy -text
+*.onnx -text
+*.pt -text
+*.whl -text
+*.pdf -text

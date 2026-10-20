@@ -1,0 +1,12 @@
+smoke: false
+seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+sizes: [5, 10, 20]
+circuit_seeds: [100000, 100001, 100002]
+families: [random, qft, ansatz, grover, arithmetic]
+devices:
+  - {kind: ring, n: 20, seed: 7}
+  - {kind: grid, n: 20, seed: 7}
+  - {kind: neutral, n: 20, seed: 7}
+  - {kind: heavy_hex, n: 20, seed: 7}
+algorithms: [sabre, noise_sabre, noiseroute, ai]
+# Add learned and checkpoint after validated training.

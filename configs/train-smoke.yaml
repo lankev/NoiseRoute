@@ -1,0 +1,19 @@
+seed: 0
+torch_device: cpu
+torch_threads: 1
+shape: {nodes: 8, edges: 16, tokens: 16}
+model: {dim: 16, layers: 1, hierarchical: true}
+topologies: [line, ring]
+families: [random, ansatz]
+circuit_depth: 2
+imitation_episodes: 8
+imitation_epochs: 2
+rollout_steps: 32
+batch_size: 16
+ppo_epochs: 4
+imitation_learning_rate: 0.00006
+ppo_learning_rate: 0.00001
+gamma: 1.0
+curriculum:
+  - {qubits: 3, steps: 64}
+  - {qubits: 5, steps: 64}

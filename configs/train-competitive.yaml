@@ -1,0 +1,49 @@
+# Development experiment, not a promise to beat SABRE. No acceptance shortcuts.
+seed: 41
+torch_device: cuda
+torch_threads: 4
+shape: {nodes: 8, edges: 16, tokens: 64}
+model: {dim: 64, layers: 2, hierarchical: true}
+topologies: [line, ring, grid]
+families: [random, ansatz]
+circuit_depth: 4
+measure_all: true
+imitation_episodes: 144
+imitation_epochs: 15
+require_demo_coverage: true
+imitation_learning_rate: 0.0001
+ppo_learning_rate: 0.00008
+reference_kl_coef: 0.05
+rollout_steps: 256
+batch_size: 32
+ppo_epochs: 10
+gamma: 1.0
+gae_lambda: 0.95
+clip_range: 0.2
+entropy_coef: 0.001
+reward_scale: 1.0
+value_loss: huber
+value_coef: 0.5
+target_kl: 0.02
+progress_interval_seconds: 10
+reward:
+  mode: sabre_delta_log_esp
+  seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+quality_gate:
+  window: 100
+  min_episodes: 30
+  max_failure_rate: 0.25
+  min_success_rate: 0.9
+curriculum:
+  - {qubits: 10, steps: 16384}
+validation:
+  every_steps: 4096
+  torch_threads: 1
+  sizes: [5]
+  topologies: [line, ring, grid]
+  families: [random, ansatz]
+  circuit_seeds: [200000, 200001]
+  device_seed: 177
+  circuit_depth: 4
+  baselines: [sabre, noise_sabre]
+  seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]

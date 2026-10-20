@@ -1,0 +1,10 @@
+[package]
+name = "noiseroute-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+[lib]
+name = "noiseroute_core"
+crate-type = ["cdylib", "rlib"]
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module"] }

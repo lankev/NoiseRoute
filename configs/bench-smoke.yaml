@@ -1,0 +1,9 @@
+smoke: true
+seeds: [0, 1]
+sizes: [5]
+circuit_seeds: [100000]
+families: [random, qft, ansatz, grover, arithmetic]
+devices:
+  - {kind: line, n: 5, seed: 7}
+  - {kind: ring, n: 5, seed: 7}
+algorithms: [sabre, noise_sabre, noiseroute]

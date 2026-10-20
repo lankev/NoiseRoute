@@ -1,0 +1,24 @@
+# Conservative profile for RTX 4060 Laptop 8 GB. Measure actual memory usage.
+seed: 41
+torch_device: cuda
+torch_threads: 4
+shape: {nodes: 128, edges: 384, tokens: 64}
+model: {dim: 64, layers: 2, hierarchical: true}
+topologies: [line, ring, grid]
+families: [random, ansatz]
+circuit_depth: 4
+imitation_episodes: 128
+imitation_epochs: 10
+rollout_steps: 256
+batch_size: 32
+ppo_epochs: 5
+imitation_learning_rate: 0.00006
+ppo_learning_rate: 0.00001
+gamma: 1.0
+gae_lambda: 0.95
+clip_range: 0.2
+entropy_coef: 0.01
+curriculum:
+  - {qubits: 5, steps: 100000}
+  - {qubits: 20, steps: 200000}
+  - {qubits: 50, steps: 300000}
