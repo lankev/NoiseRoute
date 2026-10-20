@@ -4,6 +4,8 @@ Plateforme de recherche pour le **placement et le routage quantiques sensibles a
 
 **Version 0.1.0 expérimentale.** Le pipeline est exécutable et testé. Les poids fournis proviennent d'un entraînement très court de validation. Aucune supériorité sur SABRE/AIRouting, généralisation zéro-shot ou latence NPU sur votre PC n'est revendiquée. Les cas perdants sont conservés dans les CSV.
 
+![Démo de l'interface NoiseRoute](assets/demo.jpg)
+
 **Nouveau parcours comparatif** : imitation à `5e-5`, PPO à `1e-5`, référence
 d'imitation gelée, pénalité KL, récompense `Δ log(ESP)` face à SABRE et validation
 obligatoire à 20 seeds avant création de `accepted.pt`. Lancer
