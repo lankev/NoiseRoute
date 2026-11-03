@@ -6,7 +6,7 @@
 
 [![Démo de l'interface NoiseRoute](assets/demo.png)]
 
-## TL;DR (English)
+## (English)
 
 NoiseRoute is a research platform for **noise-aware qubit placement and routing**. A single learned policy (GATv2 over the device graph + a Transformer over the circuit DAG window) decides the initial layout and the SWAP insertions to maximize the estimated success probability (ESP) of a compiled circuit. It ships with a Rust/PyO3 environment, SABRE baselines, a Qiskit transpiler plugin, and ONNX/OpenVINO export. Status: **experimental v0.1.0**. The pipeline runs and is tested; no superiority over SABRE is claimed yet, and losing cases are kept in the result CSVs.
 
