@@ -6,6 +6,8 @@
 
 [![Démo de l'interface NoiseRoute](assets/demo.png)](assets/demo.png)
 
+*Démo Streamlit : comparaison SABRE / SABRE + placement bruit / NoiseRoute (heuristique, sans checkpoint appris).*
+
 ## (English)
 
 NoiseRoute is a research platform for **noise-aware qubit placement and routing**. A single learned policy (GATv2 over the device graph + a Transformer over the circuit DAG window) decides the initial layout and the SWAP insertions to maximize the estimated success probability (ESP) of a compiled circuit. It ships with a Rust/PyO3 environment, SABRE baselines, a Qiskit transpiler plugin, and ONNX/OpenVINO export. Status: **experimental v0.1.0**. The pipeline runs and is tested; no superiority over SABRE is claimed yet, and losing cases are kept in the result CSVs.
@@ -24,14 +26,23 @@ NoiseRoute is a research platform for **noise-aware qubit placement and routing*
 
 ## Résultats actuels
 
-> Benchmark reproductible : 5 circuits × 2 devices × 3 algorithmes × 20 seeds (`results/small20`, 600 compilations) et corpus externe de 10 circuits figés (1 800 compilations).
+Le benchmark est reproductible : 5 circuits × 2 devices × 3 algorithmes × 20 seeds (`results/small20`, 600 compilations) et un corpus externe de 10 circuits figés (1 800 compilations).
 
-| Circuit | Device | Métrique | SABRE niv. 3 | SABRE + placement bruit | NoiseRoute | Verdict |
-Circuit	Device	Algo	ESP	SWAP	Profondeur 2Q
-random (5q, seed 0)	heavy-hex	SABRE	0.8164	0	3
-random (5q, seed 0)	heavy-hex	SABRE + placement bruit	0.5322	6	15
-random (5q, seed 0)	heavy-hex	NoiseRoute (heuristique)	0.5285	6	15
-**Ce que montrent les résultats** (À REMPLIR : 2 à 3 phrases, par exemple dans quels cas NoiseRoute fait mieux, dans quels cas il perd, et l'hypothèse expliquant pourquoi).
+### Exemple de compilation
+
+Circuit `random`, 5 qubits logiques sur une topologie `heavy_hex` (19 qubits physiques, 20 arêtes), seed 0, version heuristique de NoiseRoute (sans checkpoint appris) :
+
+| Algorithme | ESP | SWAP ajoutés | Profondeur 2Q | Temps de compilation |
+|---|---|---|---|---|
+| SABRE | **0.8164** | 0 | 3 | 45.8 ms |
+| SABRE + placement sensible au bruit | 0.5322 | 6 | 15 | 19.6 ms |
+| NoiseRoute (heuristique) | 0.5285 | 6 | 15 | 45.3 ms |
+
+Sur cet exemple, SABRE fait nettement mieux : l'heuristique NoiseRoute n'améliore pas son ESP. C'est un cas isolé, pas une conclusion statistique, mais il illustre l'état actuel du projet : la version heuristique sert de point de départ, et l'enjeu est de voir si la politique apprise (imitation puis PPO) peut faire mieux.
+
+### Résultats agrégés
+
+Les résultats initiaux de l'heuristique sont **moins bons que SABRE** sur plusieurs cas. Les résultats complets sont dans les CSV générés par `make bench` et décrits dans [docs/VALIDATION.md](docs/VALIDATION.md). Le protocole et les métriques sont dans [docs/PROTOCOL.md](docs/PROTOCOL.md).
 
 ### Ce que ce projet ne prétend pas
 
@@ -41,7 +52,7 @@ random (5q, seed 0)	heavy-hex	NoiseRoute (heuristique)	0.5285	6	15
 - Les poids fournis viennent d'un entraînement très court de validation.
 - 20 répétitions d'un algorithme déterministe ne sont pas 20 observations indépendantes : le petit benchmark valide le pipeline, il ne prouve pas la généralisation.
 
-Les cas perdants sont conservés dans les CSV. Détails : [docs/VALIDATION.md](docs/VALIDATION.md) et [docs/PROTOCOL.md](docs/PROTOCOL.md).
+Les cas perdants sont conservés dans les CSV.
 
 ## Démarrage rapide
 
@@ -88,9 +99,9 @@ Sans checkpoint, le plugin utilise une heuristique. Pour la politique apprise, d
 ## Reproduire les résultats
 
 ```bash
-make bench OUT=runs/bench-001                                        # 600 compilations
+make bench OUT=runs/bench-001                                                         # 600 compilations
 python -m noiseroute bench --config configs/bench-corpus.yaml --out runs/corpus-001   # 1 800 compilations
-make reproduce OUT=runs/reproduction-001                             # imitation, PPO court, export, latences, bruit
+make reproduce OUT=runs/reproduction-001                                              # imitation, PPO court, export, latences, bruit
 ```
 
 ## Entraîner et exporter
@@ -122,7 +133,7 @@ Le parcours comparatif n'écrit `accepted.pt` qu'après validation obligatoire �
 
 ## Feuille de route
 
-Prochaines étapes:
+Prochaines étapes :
 
 - [ ] Benchmark sur le corpus externe avec analyse statistique par circuit
 - [ ] Validation sur du matériel réel ou un simulateur bruité calibré
