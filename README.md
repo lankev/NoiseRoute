@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/version-0.1.0--experimental-orange) ![Licence](https://img.shields.io/badge/licence-MIT-blue) ![Python](https://img.shields.io/badge/python-3.12-blue) ![Rust](https://img.shields.io/badge/moteur-Rust%2FPyO3-black) ![Qiskit](https://img.shields.io/badge/plugin-Qiskit-6929C4)
 
-[![Démo de l'interface NoiseRoute](assets/demo.png)]
+[![Démo de l'interface NoiseRoute](assets/demo.png)](assets/demo.png)
 
 ## (English)
 
@@ -27,11 +27,10 @@ NoiseRoute is a research platform for **noise-aware qubit placement and routing*
 > Benchmark reproductible : 5 circuits × 2 devices × 3 algorithmes × 20 seeds (`results/small20`, 600 compilations) et corpus externe de 10 circuits figés (1 800 compilations).
 
 | Circuit | Device | Métrique | SABRE niv. 3 | SABRE + placement bruit | NoiseRoute | Verdict |
-|---|---|---|---|---|---|---|
-| À REMPLIR | À REMPLIR | ESP | À REMPLIR | À REMPLIR | À REMPLIR | À REMPLIR |
-| À REMPLIR | À REMPLIR | Nb. SWAP | À REMPLIR | À REMPLIR | À REMPLIR | À REMPLIR |
-| À REMPLIR | À REMPLIR | Profondeur | À REMPLIR | À REMPLIR | À REMPLIR | À REMPLIR |
-
+Circuit	Device	Algo	ESP	SWAP	Profondeur 2Q
+random (5q, seed 0)	heavy-hex	SABRE	0.8164	0	3
+random (5q, seed 0)	heavy-hex	SABRE + placement bruit	0.5322	6	15
+random (5q, seed 0)	heavy-hex	NoiseRoute (heuristique)	0.5285	6	15
 **Ce que montrent les résultats** (À REMPLIR : 2 à 3 phrases, par exemple dans quels cas NoiseRoute fait mieux, dans quels cas il perd, et l'hypothèse expliquant pourquoi).
 
 ### Ce que ce projet ne prétend pas
