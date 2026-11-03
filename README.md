@@ -1,41 +1,52 @@
 # NoiseRoute
 
-Plateforme de recherche pour le **placement et le routage quantiques sensibles au bruit** : politique partagée GATv2 + transformer, environnement Rust/PyO3, plugin Qiskit, export ONNX/OpenVINO.
+**Placement et routage de qubits sensibles au bruit, appris par IA (GNN + Transformer).**
 
-**Version 0.1.0 expérimentale.** Le pipeline est exécutable et testé. Les poids fournis proviennent d'un entraînement très court de validation. Aucune supériorité sur SABRE/AIRouting, généralisation zéro-shot ou latence NPU sur votre PC n'est revendiquée. Les cas perdants sont conservés dans les CSV.
+![Version](https://img.shields.io/badge/version-0.1.0--experimental-orange) ![Licence](https://img.shields.io/badge/licence-MIT-blue) ![Python](https://img.shields.io/badge/python-3.12-blue) ![Rust](https://img.shields.io/badge/moteur-Rust%2FPyO3-black) ![Qiskit](https://img.shields.io/badge/plugin-Qiskit-6929C4)
 
-![Démo de l'interface NoiseRoute](assets/demo.png)
+[![Démo de l'interface NoiseRoute](assets/demo.png)]
 
-**Nouveau parcours comparatif** : imitation à `5e-5`, PPO à `1e-5`, référence
-d'imitation gelée, pénalité KL, récompense `Δ log(ESP)` face à SABRE et validation
-obligatoire à 20 seeds avant création de `accepted.pt`. Lancer
-`python scripts/train_competitive.py` ou l'option **4** du menu Windows.
-Le premier profil couvre 5 qubits ; les critères exacts, la mise à jour Windows
-et la reprise sont décrits dans [docs/COMPETITIVE_TRAINING.md](docs/COMPETITIVE_TRAINING.md).
+## TL;DR (English)
 
-## Démarrage sur votre PC
+NoiseRoute is a research platform for **noise-aware qubit placement and routing**. A single learned policy (GATv2 over the device graph + a Transformer over the circuit DAG window) decides the initial layout and the SWAP insertions to maximize the estimated success probability (ESP) of a compiled circuit. It ships with a Rust/PyO3 environment, SABRE baselines, a Qiskit transpiler plugin, and ONNX/OpenVINO export. Status: **experimental v0.1.0**. The pipeline runs and is tested; no superiority over SABRE is claimed yet, and losing cases are kept in the result CSVs.
 
-Configuration prévue : Core Ultra 9 185H, 96 Go de RAM, RTX 4060 Laptop 8 Go. Python 3.12 recommandé. Depuis le dossier extrait, dans PowerShell :
+---
 
-Si Python n’est pas encore installé : `winget install --id Python.Python.3.12 -e --source winget`, puis ferme et rouvre PowerShell.
+## En bref
 
-```powershell
-./scripts/setup_windows.ps1 -Cuda
-./scripts/run_menu.ps1
-```
+| | |
+|---|---|
+| **Problème** | Sur un vrai processeur quantique, chaque porte et chaque qubit a son propre taux d'erreur. Placer et router un circuit en ignorant ce bruit dégrade la fidélité du résultat. |
+| **Approche** | Une politique unique apprise (GATv2 sur le graphe du device + Transformer sur la fenêtre DAG du circuit) choisit le placement initial puis les SWAP, avec pour objectif d'améliorer l'ESP. |
+| **Entraînement** | Imitation de traces SABRE, puis PPO masqué avec pénalité KL et récompense `Δ log(ESP)` face à SABRE. |
+| **Intégration** | Plugin Qiskit (`layout_method="noiseroute"`, `routing_method="noiseroute"`), export ONNX et OpenVINO (CPU/NPU). |
+| **État** | v0.1.0 expérimentale. Pipeline exécutable et testé, campagne scientifique à réaliser. |
 
-Si Windows affiche `PSSecurityException` ou « fichier non signé », utilise les lanceurs inclus :
+## Résultats actuels
 
-```powershell
-./scripts/setup_windows.cmd -Cuda
-./scripts/run_menu.cmd
-```
+> Benchmark reproductible : 5 circuits × 2 devices × 3 algorithmes × 20 seeds (`results/small20`, 600 compilations) et corpus externe de 10 circuits figés (1 800 compilations).
 
-Alternative dans la session PowerShell courante : `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force`, puis relance les deux commandes `.ps1`. La portée `Process` disparaît quand la fenêtre est fermée.
+| Circuit | Device | Métrique | SABRE niv. 3 | SABRE + placement bruit | NoiseRoute | Verdict |
+|---|---|---|---|---|---|---|
+| À REMPLIR | À REMPLIR | ESP | À REMPLIR | À REMPLIR | À REMPLIR | À REMPLIR |
+| À REMPLIR | À REMPLIR | Nb. SWAP | À REMPLIR | À REMPLIR | À REMPLIR | À REMPLIR |
+| À REMPLIR | À REMPLIR | Profondeur | À REMPLIR | À REMPLIR | À REMPLIR | À REMPLIR |
 
-Le menu lance les tests, le benchmark à 20 seeds, la démo, l'entraînement ou la mesure NPU. Si PowerShell bloque les scripts, utilisez les commandes Python manuelles de [docs/INSTALL.md](docs/INSTALL.md). Pour accélérer le moteur, installez Rust et les outils C++ de Visual Studio, puis relancez `./scripts/setup_windows.ps1 -Cuda -Rust`. Sans extension compilée, un moteur Python de référence assure le fonctionnement.
+**Ce que montrent les résultats** (À REMPLIR : 2 à 3 phrases, par exemple dans quels cas NoiseRoute fait mieux, dans quels cas il perd, et l'hypothèse expliquant pourquoi).
 
-Sous Linux/WSL :
+### Ce que ce projet ne prétend pas
+
+- Aucune supériorité démontrée sur SABRE ni sur AIRouting.
+- Aucune généralisation zéro-shot revendiquée.
+- Aucune latence NPU mesurée sur du matériel non vérifié (pas de basculement CPU silencieux).
+- Les poids fournis viennent d'un entraînement très court de validation.
+- 20 répétitions d'un algorithme déterministe ne sont pas 20 observations indépendantes : le petit benchmark valide le pipeline, il ne prouve pas la généralisation.
+
+Les cas perdants sont conservés dans les CSV. Détails : [docs/VALIDATION.md](docs/VALIDATION.md) et [docs/PROTOCOL.md](docs/PROTOCOL.md).
+
+## Démarrage rapide
+
+**Linux / WSL**
 
 ```bash
 bash scripts/setup_linux.sh cuda
@@ -44,24 +55,16 @@ python -m pytest -q
 python -m streamlit run examples/demo.py
 ```
 
-## Ce qui est livré
+**Windows (PowerShell)**
 
-| Fonction | Code et état |
-|---|---|
-| Circuits | Générateurs QFT, Grover, ansatz, random, arithmétique ; imports MQT Bench/QASMBench ; 10 circuits externes figés |
-| Devices | Ligne, anneau, grille, heavy-hex, graphe géométrique ; snapshot calibré FakeBrisbane 127 qubits |
-| Baselines | SABRE niveau 3, SABRE avec placement sensible au bruit, adaptateur AIRouting local isolé |
-| Environnement | Placement injectif puis SWAP masqués ; DAG, permutations et transitions Rust ; oracle Python |
-| Politique unique | GATv2 du device + transformer de la fenêtre DAG ; têtes placement/SWAP et critique partagés |
-| Apprentissage | Imitation de traces SABRE, PPO masqué, curriculum 5→20→50, baseline SB3 MaskablePPO |
-| Recherche | Beam search configurable ; secours par plus court chemin et comptage des recours |
-| Bruit | ESP native avec erreurs de portes, lecture et idles ASAP ; simulation Aer et Hellinger |
-| Échelle | Encodeur hiérarchique ; vérification structurelle d'un routage 100→127 qubits |
-| Intégration | Distillation, ONNX statique, OpenVINO CPU/NPU explicite, plugins Qiskit layout/routing |
-| Reproduction | CSV, QPY, snapshots, hashes, tests, CI, Docker, scripts Windows/Linux, démo locale |
-| Communication | Brouillon LaTeX et fiche modèle ; publication et campagne scientifique à réaliser |
+```powershell
+./scripts/setup_windows.ps1 -Cuda
+./scripts/run_menu.ps1
+```
 
-## Exemple Qiskit
+Si PowerShell bloque les scripts, utilise `./scripts/setup_windows.cmd -Cuda` puis `./scripts/run_menu.cmd`. Plus de détails dans [docs/INSTALL.md](docs/INSTALL.md).
+
+### Exemple Qiskit
 
 ```python
 from qiskit import QuantumCircuit, transpile
@@ -72,6 +75,7 @@ qc.h(0)
 qc.cx(0, 4)
 qc.cx(0, 2)
 qc.measure_all()
+
 device = synthetic("ring", 5, seed=7)
 result = transpile(
     qc, target=device.target(), optimization_level=3,
@@ -80,59 +84,64 @@ result = transpile(
 print(result)
 ```
 
-Sans checkpoint, le plugin utilise une heuristique. Pour employer la même politique apprise dans les deux stages :
+Sans checkpoint, le plugin utilise une heuristique. Pour la politique apprise, définis `NOISEROUTE_MODEL`, `NOISEROUTE_ENGINE=onnx` et `NOISEROUTE_BEAM`.
 
-```powershell
-$env:NOISEROUTE_MODEL = 'models/smoke-policy.onnx'
-$env:NOISEROUTE_ENGINE = 'onnx'
-$env:NOISEROUTE_BEAM = '1'
-.venv/Scripts/python.exe examples/plugin.py
+## Reproduire les résultats
+
+```bash
+make bench OUT=runs/bench-001                                        # 600 compilations
+python -m noiseroute bench --config configs/bench-corpus.yaml --out runs/corpus-001   # 1 800 compilations
+make reproduce OUT=runs/reproduction-001                             # imitation, PPO court, export, latences, bruit
 ```
-
-Les modèles `smoke` acceptent au plus 8 nœuds et 16 arêtes ; le profil laptop, 128 nœuds et 384 arêtes. Un dépassement est une erreur explicite. Utilisez QPY pour préserver les layouts ; le QASM seul ne conserve pas cette information.
 
 ## Entraîner et exporter
 
-Pour l'expérience comparative avec acceptation conditionnelle, utiliser le
-nouveau parcours ci-dessus. Les commandes ci-dessous restent le curriculum
-historique et ne certifient pas les checkpoints :
-
 ```bash
+python scripts/train_competitive.py          # parcours comparatif avec validation à 20 seeds
 python -m noiseroute imitate --config configs/train-laptop.yaml --out runs/laptop-bc
 python -m noiseroute train --config configs/train-laptop.yaml --checkpoint runs/laptop-bc/imitation.pt --out runs/laptop-ppo
-python -m noiseroute distill --config configs/train-laptop.yaml --checkpoint runs/laptop-ppo/last.pt --episodes 128 --out runs/student.pt
 python -m noiseroute export --checkpoint runs/student.pt --out runs/student.onnx
-python -m noiseroute latency --model runs/student.onnx --engine openvino --device CPU --out runs/latency-cpu.json
-python -m noiseroute latency --model runs/student.onnx --engine openvino --device NPU --out runs/latency-npu.json
 ```
 
-Le profil laptop utilise CUDA, batch 16 et dimension 64 : point de départ pour 8 Go de VRAM, à mesurer avec `nvidia-smi`. Les 96 Go de RAM ne deviennent pas de la VRAM CUDA. La mention « 70 Go NPU » n'est pas traitée comme une mémoire NPU dédiée. `noiseroute doctor` rapporte les accélérateurs réellement accessibles. Aucun basculement CPU silencieux ne transforme un test NPU échoué en réussite.
+Le parcours comparatif n'écrit `accepted.pt` qu'après validation obligatoire à 20 seeds. Reprise d'un entraînement interrompu : [docs/TRAINING_RECOVERY.md](docs/TRAINING_RECOVERY.md).
 
-Pour reprendre un PPO interrompu sans refaire l’imitation, voir [progression et reprise](docs/TRAINING_RECOVERY.md). Le terminal affiche maintenant les phases et les compteurs sauvegardés.
+## Ce qui est livré
 
-Après le diagnostic des premiers checkpoints, un [profil court et contrôlé](docs/PPO_DIAGNOSTIC.md) est disponible avec `python scripts/train_diagnostic.py` (option 7 du menu Windows). Il ne démontre pas encore un gain sur SABRE.
+| Brique | Contenu |
+|---|---|
+| Circuits | QFT, Grover, ansatz, random, arithmétique ; imports MQT Bench / QASMBench ; 10 circuits externes figés |
+| Devices | Ligne, anneau, grille, heavy-hex, graphe géométrique ; snapshot calibré FakeBrisbane 127 qubits |
+| Baselines | SABRE niveau 3, SABRE avec placement sensible au bruit, adaptateur AIRouting isolé |
+| Environnement | Placement injectif puis SWAP masqués ; DAG, permutations et transitions en Rust, oracle Python |
+| Politique | GATv2 (device) + Transformer (fenêtre DAG), têtes placement / SWAP / critique partagées |
+| Apprentissage | Imitation SABRE, PPO masqué, curriculum 5 → 20 → 50 qubits, baseline SB3 MaskablePPO |
+| Recherche | Beam search configurable, secours par plus court chemin avec comptage des recours |
+| Bruit | ESP native (erreurs de portes, lecture, idles ASAP), simulation Aer, distance de Hellinger |
+| Échelle | Encodeur hiérarchique, vérification structurelle d'un routage 100 → 127 qubits |
+| Déploiement | Distillation, ONNX statique, OpenVINO CPU/NPU, plugins Qiskit layout et routing |
+| Reproductibilité | CSV, QPY, snapshots, hashes, tests, CI, Docker, scripts Windows/Linux, démo locale |
 
-## Benchmarks reproductibles
+## Feuille de route
 
-```bash
-make bench OUT=runs/bench-001
-python -m noiseroute bench --config configs/bench-corpus.yaml --out runs/corpus-001
-python -m noiseroute bench --config configs/bench-zeroshot.yaml --out runs/zeroshot-001
-make reproduce OUT=runs/reproduction-001
-```
+Prochaines étapes:
 
-`make bench` recalcule les 600 compilations de `results/small20` : 5 circuits × 2 devices × 3 algorithmes × 20 seeds. `bench-corpus` recalcule les 1 800 compilations du corpus externe. `make reproduce` ajoute imitation, PPO court, export, latences CPU et simulation bruitée. Un dossier contenant déjà un CSV n'est pas écrasé. Les durées dépendent de la machine, des versions et de la charge.
+- [ ] Benchmark sur le corpus externe avec analyse statistique par circuit
+- [ ] Validation sur du matériel réel ou un simulateur bruité calibré
+- [ ] Mesures de latence NPU vérifiées
+- [ ] Rédaction et publication des résultats
 
-Les résultats initiaux de l'heuristique sont **moins bons que SABRE** sur plusieurs cas. Voir [docs/VALIDATION.md](docs/VALIDATION.md), les CSV complets et [docs/PROTOCOL.md](docs/PROTOCOL.md). Les répétitions d'un algorithme déterministe ne constituent pas 20 observations indépendantes. Le petit benchmark contrôle le pipeline, sans prouver sa généralisation.
+Plan complet : [docs/ROADMAP.md](docs/ROADMAP.md).
 
-## Lire ensuite
+## Documentation
 
-- [Installation, AIRouting et accélérateurs](docs/INSTALL.md)
-- [Architecture et limites](docs/ARCHITECTURE.md)
-- [Protocole, métriques et équivalence](docs/PROTOCOL.md)
-- [Validations réalisées](docs/VALIDATION.md)
-- [Plan des 26 semaines](docs/ROADMAP.md)
-- [Sources techniques](docs/SOURCES.md)
-- [Fiche des modèles fournis](models/README.md)
+[Installation](docs/INSTALL.md) · [Architecture et limites](docs/ARCHITECTURE.md) · [Protocole et métriques](docs/PROTOCOL.md) · [Validations](docs/VALIDATION.md) · [Sources](docs/SOURCES.md) · [Fiche des modèles](models/README.md)
 
-Licence MIT pour le code NoiseRoute. Les fichiers QASMBench conservent leur licence et leur NOTICE. Rien n'est publié sur PyPI, Hugging Face ou arXiv par cette archive.
+## Contact
+
+**Kévin Landbeck** : [LinkedIn](https://www.linkedin.com/in/kevin-landbeck-b94884242) · [GitHub](https://github.com/lankev)
+
+Retours, critiques sur le protocole de benchmark et idées sont les bienvenus (issues ou message direct).
+
+## Licence
+
+Code sous licence MIT. Les fichiers QASMBench conservent leur licence et leur NOTICE.
